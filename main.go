@@ -4,10 +4,10 @@ import (
 	"log"
 	"os"
 	"database/sql"
-	_ "github.com/lib/pq"
 
 	"github.com/JustinPras/BlogAggregator/internal/config"
 	"github.com/JustinPras/BlogAggregator/internal/database"
+	_ "github.com/lib/pq"
 )
 
 type state struct {
