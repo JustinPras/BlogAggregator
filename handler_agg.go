@@ -11,7 +11,7 @@ func handlerAggregator(s *state, cmd command) error {
 		return fmt.Errorf("couldn't fetch feed: %w", err)
 	}
 
-	fmt.Printf("Feed found: %+v\n", rssFeed)
+	fmt.Printf("RSS Feed: %+v\n", rssFeed)
 
 	return nil
 }
