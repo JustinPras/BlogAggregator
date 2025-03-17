@@ -13,4 +13,16 @@ go install github.com/JustinPras/BlogAggregator
 ```
 
 ### Commands
-- ``` test ```
+Example usage of commands:
+``` go run . command_name ```
+- ``` register ```
+- ``` login ```
+- ``` reset ```
+- ``` users ```
+- ``` agg ```
+- ``` addfeed ```
+- ``` feeds ```
+- ``` follow ```
+- ``` following ```
+- ``` unfollow ```
+- ``` browse ```
