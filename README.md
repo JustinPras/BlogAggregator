@@ -13,7 +13,7 @@
 Example usage of commands:
 ``` go run . command_name ```
 
-
+#### List of commands:
 - ``` register ```
 - ``` login ```
 - ``` reset ```
