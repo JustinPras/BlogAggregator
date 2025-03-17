@@ -2,7 +2,7 @@
 
 ### How to set up the blog aggregator
 1. Ensure Postgres and Go is installed
-2. run
+2. Run:
 ```
 go install github.com/JustinPras/BlogAggregator
 ```
@@ -13,3 +13,4 @@ go install github.com/JustinPras/BlogAggregator
 ```
 
 ### Commands
+- ``` test ```
