@@ -12,6 +12,8 @@
 ### Commands
 Example usage of commands:
 ``` go run . command_name ```
+
+
 - ``` register ```
 - ``` login ```
 - ``` reset ```
