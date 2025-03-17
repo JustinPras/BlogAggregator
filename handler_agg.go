@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"time"
 	"log"
+
+	"github.com/google/uuid"
+	"github.com/JustinPras/BlogAggregator/internal/database"
 )
 
 func handlerAggregator(s *state, cmd command) error {
@@ -43,8 +46,31 @@ func scrapeFeeds(s *state) {
 		log.Printf("Error fetching feed %s: %w", feed.Name, err)
 	}
 
+	layoutTime := "Mon, 02 Jan 2006 15:04:05 -0700"
+	 
+
 	for _, item := range rssFeed.Channel.Item {
-		fmt.Printf("* Title:     %s\n", item.Title)
+		parsedPubDate, err := time.Parse(layoutTime, item.PubDate)
+		if err != nil {
+			log.Printf("Error parsing date: %w", err)
+		}	
+
+		createPostParams := database.CreatePostParams {
+			ID:			uuid.New(),
+			CreatedAt:	time.Now(),
+			UpdatedAt: 	time.Now(),
+			Title:		item.Title,
+			Url:		item.Link,
+			Description:item.Description,
+			PublishedAt:parsedPubDate,
+			FeedID:		feed.ID,
+		}
+		
+		s.db.CreatePost(context.Background(), createPostParams)
 	}
+
+	// for _, item := range rssFeed.Channel.Item {
+	// 	fmt.Printf("* Pub Date:     %s\n", item.PubDate)
+	// }
 	log.Printf("Feed %s collected, %v posts found", feed.Name, len(rssFeed.Channel.Item))
 }
