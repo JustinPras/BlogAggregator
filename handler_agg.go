@@ -4,9 +4,7 @@ import (
 	"context"
 	"fmt"
 	"time"
-	"database/sql"
-
-	"github.com/JustinPras/BlogAggregator/internal/database"
+	"log"
 )
 
 func handlerAggregator(s *state, cmd command) error {
@@ -19,7 +17,7 @@ func handlerAggregator(s *state, cmd command) error {
 		return fmt.Errorf("Invalid duration entered: %w", err)
 	}
 
-	fmt.Printf("Collecting feeds every %v\n", timeBetweenRequests)
+	fmt.Printf("Collecting feeds every %v...\n", timeBetweenRequests)
 
 	ticker := time.NewTicker(timeBetweenRequests)
 	for ; ; <-ticker.C {
@@ -29,32 +27,24 @@ func handlerAggregator(s *state, cmd command) error {
 	return nil
 }
 
-func scrapeFeeds(s *state) error {
+func scrapeFeeds(s *state) {
 	feed, err := s.db.GetNextFeedToFetch(context.Background())
 	if err != nil {
-		return fmt.Errorf("Error getting next feed to fetch: %w", err)
+		log.Printf("Error getting next feed to fetch: %w\n", err)
 	}
 
-	lastFetchedAt := sql.NullTime{Time: time.Now(), Valid: true}
-
-	markFeedFetchedParams := database.MarkFeedFetchedParams {
-		LastFetchedAt:	lastFetchedAt,
-		UpdatedAt:		time.Now(),
-		ID:				feed.ID,
-	}
-
-	err = s.db.MarkFeedFetched(context.Background(), markFeedFetchedParams)
+	err = s.db.MarkFeedFetched(context.Background(), feed.ID)
 	if err != nil {
-		return fmt.Errorf("Error marking feed as fetched: %w", err)
+		log.Printf("Error marking feed %s as fetched: %w\n", feed.Name, err)
 	}
 
 	rssFeed, err := fetchFeed(context.Background(), feed.Url)
 	if err != nil {
-		return fmt.Errorf("Error fetching feed: %w", err)
+		log.Printf("Error fetching feed %s: %w", feed.Name, err)
 	}
 
 	for _, item := range rssFeed.Channel.Item {
 		fmt.Printf("* Title:     %s\n", item.Title)
 	}
-	return nil
+	log.Printf("Feed %s collected, %v posts found", feed.Name, len(rssFeed.Channel.Item))
 }
