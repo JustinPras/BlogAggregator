@@ -26,7 +26,7 @@ func handlerDisplayFeeds(s *state, cmd command) error {
 		}
 
 		printFeed(feed, user)
-		fmt.Println("============================")
+		fmt.Println("=====================================")
 	}
 	return nil
 }
@@ -58,10 +58,23 @@ func handlerAddFeed(s *state, cmd command) error {
 		return fmt.Errorf("couldn't create new feed: %w", err)
 	}
 
+	feedFollowParams := database.CreateFeedFollowParams {
+		ID:			uuid.New(),
+		CreatedAt:	time.Now(),
+		UpdatedAt:	time.Now(),
+		UserID:		currentUser.ID,
+		FeedID:		feed.ID,
+	}
+	feedFollow, err := s.db.CreateFeedFollow(context.Background(), feedFollowParams)
+	if err != nil {
+		return fmt.Errorf("Error following feed: %w", err)
+	}
+
 	fmt.Println("Feed created successfully!")
 	printFeed(feed, currentUser)
-
-	followAddedFeed(s, cmd, currentUser)
+	fmt.Println("=====================================")
+	fmt.Printf("User '%s' followed the feed '%s' successfully!\n", feedFollow.UserName, feedFollow.FeedName)
+	fmt.Println("=====================================")
 	return nil
 }
 
@@ -72,29 +85,4 @@ func printFeed(feed database.Feed, user database.User) {
 	fmt.Printf("* Name:          %s\n", feed.Name)
 	fmt.Printf("* URL:           %s\n", feed.Url)
 	fmt.Printf("* User:          %s\n", user.Name)
-}
-
-func followAddedFeed(s *state, cmd command, currentUser database.User) error {
-	url := cmd.Args[1]
-
-	feed, err := s.db.GetFeedByURL(context.Background(), url)
-	if err != nil {
-		return fmt.Errorf("That feed does not exist: %w", err)
-	}
-
-	feedFollowParams := database.CreateFeedFollowParams {
-		ID:			uuid.New(),
-		CreatedAt:	time.Now(),
-		UpdatedAt:	time.Now(),
-		UserID:		currentUser.ID,
-		FeedID:		feed.ID,
-	}
-
-	feedFollow, err := s.db.CreateFeedFollow(context.Background(), feedFollowParams)
-	if err != nil {
-		return fmt.Errorf("Error following feed: %w", err)
-	}
-
-	fmt.Printf("User '%s' followed the feed '%s' successfully!\n", feedFollow.UserName, feedFollow.FeedName)
-	return nil
 }

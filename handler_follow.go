@@ -44,7 +44,7 @@ func handlerFollow(s *state, cmd command) error {
 	return nil
 }
 
-func handlerFollowing(s *state, cmd command) error {
+func handlerListFeedFollows(s *state, cmd command) error {
 	currentUser, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
 	if err != nil {
 		return fmt.Errorf("Error retrieving current user: %w", err)
@@ -55,6 +55,10 @@ func handlerFollowing(s *state, cmd command) error {
 		return fmt.Errorf("Error retrieving followed feeds for current user: %w", err)
 	}
 
+	if len(feedFollows) == 0 {
+		fmt.Println("No feed follows found for this user.")
+		return nil
+	}
 
 	fmt.Println("Current user is following the listed feeds:")
 	for _, feedFollow := range(feedFollows) {
