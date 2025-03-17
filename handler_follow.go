@@ -9,15 +9,10 @@ import (
 	"github.com/JustinPras/BlogAggregator/internal/database"
 )
 
-func handlerFollow(s *state, cmd command) error {
+func handlerFollow(s *state, cmd command, currentUser database.User) error {
 	if len(cmd.Args) != 1 {
 		return fmt.Errorf("usage: %s <url>", cmd.Name)
 	}
-
-	currentUser, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
-	if err != nil {
-		return fmt.Errorf("Error retrieving current user: %w", err)
-	}	
 
 	url := cmd.Args[0]
 
@@ -44,11 +39,7 @@ func handlerFollow(s *state, cmd command) error {
 	return nil
 }
 
-func handlerListFeedFollows(s *state, cmd command) error {
-	currentUser, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
-	if err != nil {
-		return fmt.Errorf("Error retrieving current user: %w", err)
-	}	
+func handlerListFeedFollows(s *state, cmd command, currentUser database.User) error {
 
 	feedFollows, err := s.db.GetFeedFollowsForUser(context.Background(), currentUser.ID)
 	if err != nil {
