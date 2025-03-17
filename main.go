@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"database/sql"
+	"context"
 
 	"github.com/JustinPras/BlogAggregator/internal/config"
 	"github.com/JustinPras/BlogAggregator/internal/database"
@@ -62,3 +63,13 @@ func main() {
 	}
 }
 
+func middlewareLoggedIn(handler func(s *state, cmd command, currentUser database.User) error) func(*state, command) error {
+	return func(s *state, cmd command) error {
+        currentUser, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
+        if err != nil {
+            return err
+        }
+
+        return handler(s, cmd, currentUser)
+    }
+}
