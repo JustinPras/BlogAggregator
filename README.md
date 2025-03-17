@@ -1,4 +1,4 @@
-# BlogAggregator
+# BlogAggregator (gator)
 
 ### How to set up the blog aggregator
 1. Ensure Postgres and Go is installed
