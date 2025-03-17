@@ -11,7 +11,7 @@
 
 ### Commands
 Example usage of commands:
-``` go run . command_name ```
+``` BlogAggregator <command_name> <optional_args> ```
 
 #### List of commands:
 - ``` register ```
