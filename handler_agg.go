@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 	"log"
-	"strconv"
 
 	"github.com/google/uuid"
 	"github.com/JustinPras/BlogAggregator/internal/database"
@@ -45,13 +44,10 @@ func scrapeFeeds(s *state) {
 	rssFeed, err := fetchFeed(context.Background(), feed.Url)
 	if err != nil {
 		log.Printf("Error fetching feed %s: %w", feed.Name, err)
-	}
-
-	layoutTime := "Mon, 02 Jan 2006 15:04:05 -0700"
-	 
+	} 
 
 	for _, item := range rssFeed.Channel.Item {
-		parsedPubDate, err := time.Parse(layoutTime, item.PubDate)
+		parsedPubDate, err := time.Parse(time.RFC1123Z, item.PubDate)
 		if err != nil {
 			log.Printf("Error parsing date: %w", err)
 		}	
@@ -71,46 +67,4 @@ func scrapeFeeds(s *state) {
 	}
 
 	log.Printf("Feed %s collected, %v posts found", feed.Name, len(rssFeed.Channel.Item))
-}
-
-func handlerBrowse(s *state, cmd command, currentUser database.User) error {
-	var limit int32
-	limit = 2
-	if len(cmd.Args) == 1 {
-		num, err := strconv.ParseInt(cmd.Args[0], 10, 0)
-		if err != nil {
-			return fmt.Errorf("Error parsing specified limit %s: %w", cmd.Args[0], err)
-		}
-		limit = int32(num)
-	}
-
-	
-
-	getPostsByUserParams := database.GetPostsByUserParams{
-		UserID:	currentUser.ID,
-		Limit:	limit,
-	}
-
-	posts, err := s.db.GetPostsByUser(context.Background(), getPostsByUserParams)
-	if err != nil {
-		return fmt.Errorf("Error retrieving posts for user %s: %w", currentUser.Name, err)
-	}
-
-	for _, post := range(posts) {
-		printPost(post)
-		fmt.Println("=====================================")
-	}
-
-	return nil
-}
-
-func printPost(post database.Post) {
-	fmt.Printf("* ID:            %s\n", post.ID)
-	fmt.Printf("* Created:       %v\n", post.CreatedAt)
-	fmt.Printf("* Updated:       %v\n", post.UpdatedAt)
-	fmt.Printf("* Title:         %s\n", post.Title)
-	fmt.Printf("* URL:           %s\n", post.Url)
-	fmt.Printf("* Description:   %s\n", post.Description)
-	fmt.Printf("* Published:     %v\n", post.PublishedAt)
-	fmt.Printf("* Feed ID:       %s\n", post.FeedID)
 }
